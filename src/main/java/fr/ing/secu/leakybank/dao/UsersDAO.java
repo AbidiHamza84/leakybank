@@ -41,7 +41,11 @@ public class UsersDAO {
 
 	/** Return the list of non-admin users */
 	public List<User> findUsers() {
-		return jdbcTemplate.query("select LOGIN, FIRST_NAME, LAST_NAME, IS_ADMIN from users where IS_ADMIN = false", userRowMapper);
+		return jdbcTemplate.query(
+				"select LOGIN, FIRST_NAME, LAST_NAME, IS_ADMIN from users where IS_ADMIN = ?"
+				, preparedStatement -> {
+					preparedStatement.setBoolean(1, false);
+				}, userRowMapper);
 	}
 
 	public void deleteUser(String login) {
