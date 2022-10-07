@@ -49,14 +49,20 @@ public class AdminController extends BaseController {
 	 * Main admin page
 	 */
 	@RequestMapping(value="/users", method = RequestMethod.GET)
-	public String mainPage(Model model) {
+	public String mainPage(Model model) throws Exception {
+		if (!userSession.getUser().isAdmin()) {
+			throw new Exception("Action not allowed");
+		}
+
 		model.addAttribute("users", usersDao.findUsers());
 		return "admin/users";
 	}
 	
-	@RequestMapping(value="/users/{userLogin}/delete", method = RequestMethod.GET)
-	public String deleteUser(@PathVariable("userLogin") String userLogin, Model model) {
-		
+	@RequestMapping(value="/users/{userLogin}/delete", method = RequestMethod.DELETE)
+	public String deleteUser(@PathVariable("userLogin") String userLogin, Model model) throws Exception {
+		if (!userSession.getUser().isAdmin()) {
+			throw new Exception("Action not allowed");
+		}
 		usersDao.deleteUser(userLogin);
 		mainPage(model);
 		
@@ -64,50 +70,55 @@ public class AdminController extends BaseController {
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value="/sqlConsole")
-	public String displaySQLConsole(@ModelAttribute("sqlForm") SQLConsoleForm sqlForm, BindingResult result, final ModelMap model) {
+	public String displaySQLConsole(@ModelAttribute("sqlForm") SQLConsoleForm sqlForm, BindingResult result, final ModelMap model) throws Exception {
+		if (!userSession.getUser().isAdmin()) {
+			throw new Exception("Action not allowed");
+		}
+
 		return "admin/sql";
 	}
 	
 	@RequestMapping(method = RequestMethod.POST, value="/sqlConsole")
-	public String executeSQLQuery(@ModelAttribute("sqlForm") @Valid SQLConsoleForm sqlForm, BindingResult result, final ModelMap model) {
-		
-		if (userSession.getUser().isAdmin()) {
-			try {
-			SQLConsoleForm queryResult = jdbcTemplate.execute(sqlForm.getSqlQuery(), (PreparedStatement ps) -> {
-				
-				SQLConsoleForm data = new SQLConsoleForm();
-				data.setColumnNames(new ArrayList<String>());
-				data.setResultSet(new ArrayList<List<String>>());
-				ps.execute();
-				ResultSet rs = ps.getResultSet();
-				
-				if (rs != null) {
-					// Get the list of column names
-					ResultSetMetaData metaData = rs.getMetaData();
+	public String executeSQLQuery(@ModelAttribute("sqlForm") @Valid SQLConsoleForm sqlForm, BindingResult result, final ModelMap model) throws Exception {
+		if (!userSession.getUser().isAdmin()) {
+			throw new Exception("Action not allowed");
+		}
+
+		try {
+		SQLConsoleForm queryResult = jdbcTemplate.execute(sqlForm.getSqlQuery(), (PreparedStatement ps) -> {
+
+			SQLConsoleForm data = new SQLConsoleForm();
+			data.setColumnNames(new ArrayList<String>());
+			data.setResultSet(new ArrayList<List<String>>());
+			ps.execute();
+			ResultSet rs = ps.getResultSet();
+
+			if (rs != null) {
+				// Get the list of column names
+				ResultSetMetaData metaData = rs.getMetaData();
+				for (int i = 0; i < metaData.getColumnCount(); i++) {
+					data.getColumnNames().add(metaData.getColumnLabel(i + 1 ));
+				}
+				while(rs.next()) {
+					ArrayList<String> row = new ArrayList<String>();
 					for (int i = 0; i < metaData.getColumnCount(); i++) {
-						data.getColumnNames().add(metaData.getColumnLabel(i + 1 ));
+						row.add(rs.getString(i + 1));
 					}
-					while(rs.next()) {
-						ArrayList<String> row = new ArrayList<String>();
-						for (int i = 0; i < metaData.getColumnCount(); i++) {
-							row.add(rs.getString(i + 1));
-						}
-						data.getResultSet().add(row);
-					}
-					
-					rs.close();
-				} 
-				
-				return data;
-			});
-			
-			
-			sqlForm.setColumnNames(queryResult.getColumnNames());
-			sqlForm.setResultSet(queryResult.getResultSet());
-			
-			} catch (DataAccessException ex) {
-				result.rejectValue("sqlQuery", "sqlQuery.badRequest", ex.getMostSpecificCause().getMessage());
+					data.getResultSet().add(row);
+				}
+
+				rs.close();
 			}
+
+			return data;
+		});
+
+
+		sqlForm.setColumnNames(queryResult.getColumnNames());
+		sqlForm.setResultSet(queryResult.getResultSet());
+
+		} catch (DataAccessException ex) {
+			result.rejectValue("sqlQuery", "sqlQuery.badRequest", ex.getMostSpecificCause().getMessage());
 		}
 		
 		return "admin/sql";
