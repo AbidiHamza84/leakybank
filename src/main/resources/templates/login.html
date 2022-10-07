@@ -8,7 +8,7 @@
 				<img src="img/logo.svg" height="200px"/>
 				Welcome to <b>Leaky Bank</b>
 			</h1>
-			<div th:replace="fragments/nav :: topMessage(${message})"></div>
+			<div th:replace="fragments/nav :: topMessage(${message == null ? null : message.replaceAll('[^a-zA-Z0-9 .()_-]','')})"></div>
 
 			<form action="#" th:action="@{/login}" th:object="${loginForm}"
 				method="post" style="margin-top: 50px;">
