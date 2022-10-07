@@ -49,6 +49,9 @@ public class UsersDAO {
 	}
 
 	public void deleteUser(String login) {
-		jdbcTemplate.update("delete from USERS where login='" + login + "'");
+		jdbcTemplate.update("delete from USERS where login = ?"
+				, preparedStatement -> {
+					preparedStatement.setString(1, login);
+				});
 	}
 }
