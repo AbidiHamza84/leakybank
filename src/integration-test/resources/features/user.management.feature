@@ -1,11 +1,14 @@
 Feature: UserManagement
 
-  Scenario: [UserManagement] Admin deletes a user account
-    Given [UserManagement] admin is connected
-    When [UserManagement] the admin try to delete a user account
-    Then [UserManagement] the response is ok
+  Scenario: User deletes a user account
+    Given user is connected
+    When the user try to delete a user account
+    Then the user failed to delete the user account
+    And the user account still present in database
 
-  Scenario: [UserManagement] User deletes a user account
-    Given [UserManagement] user is connected
-    When [UserManagement] the user try to delete a user account
-    Then [UserManagement] the response is ko
+  Scenario: Admin deletes a user account
+    Given admin is connected
+    When the admin try to delete a user account
+    Then the admin succeed to delete the user account
+    And the user account is successfully deleted from database
+

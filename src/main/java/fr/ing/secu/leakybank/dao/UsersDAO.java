@@ -48,6 +48,14 @@ public class UsersDAO {
 				}, userRowMapper);
 	}
 
+	public Optional<User> findUser(String username) {
+		return jdbcTemplate.query(
+				"select LOGIN, FIRST_NAME, LAST_NAME, IS_ADMIN from users where LOGIN = ?"
+				, preparedStatement -> {
+					preparedStatement.setString(1, username);
+				}, userRowMapper).stream().findFirst();
+	}
+
 	public void deleteUser(String login) {
 		jdbcTemplate.update("delete from USERS where login = ?"
 				, preparedStatement -> {
