@@ -4,5 +4,7 @@ target/
 .classpath
 .settings
 .metadata
+.idea/
+.vscode/
 
 
