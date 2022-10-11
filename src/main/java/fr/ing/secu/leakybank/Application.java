@@ -6,14 +6,15 @@ import java.net.UnknownHostException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.context.embedded.EmbeddedServletContainerCustomizer;
+import org.springframework.boot.web.server.WebServerFactoryCustomizer;
+import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * Main class of the application
@@ -24,14 +25,20 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @EnableAutoConfiguration
 @ComponentScan
 @Configuration
-public class Application extends WebMvcConfigurerAdapter {
+public class Application implements WebMvcConfigurer, WebServerFactoryCustomizer<ConfigurableServletWebServerFactory> {
+	final
+	ConfigurableServletWebServerFactory webServerFactory;
+
+	public Application(ConfigurableServletWebServerFactory webServerFactory, AuthenticatedInterceptor authenticatedInterceptor) {
+		this.webServerFactory = webServerFactory;
+		this.authenticatedInterceptor = authenticatedInterceptor;
+	}
 
 	public static void main(String[] args) throws Exception {
 		SpringApplication.run(Application.class, args);
 	}
 
-	@Autowired
-	private AuthenticatedInterceptor authenticatedInterceptor;
+	private final AuthenticatedInterceptor authenticatedInterceptor;
 
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
@@ -44,20 +51,12 @@ public class Application extends WebMvcConfigurerAdapter {
 		return new UserSession();
 	}
 
-	/**
-	 * Customize the servlet container to : - Listen on localhost only
-	 */
-	@Bean
-	public EmbeddedServletContainerCustomizer getServletContainerCustomization() {
-
-		return container -> {
-			try {
-				// Restrict access to localhost only
-				container.setAddress(InetAddress.getByName("127.0.0.1"));
-			} catch (UnknownHostException ex) {
-				throw new IllegalArgumentException("Cannot bind server to 127.0.0.1 address: '" + ex.getMessage() + "'", ex);
-			}
-		};
-
+	@Override
+	public void customize(ConfigurableServletWebServerFactory factory) {
+		try {
+			factory.setAddress(InetAddress.getByName("127.0.0.1"));
+		} catch (UnknownHostException e) {
+			throw new IllegalArgumentException("Cannot bind server to 127.0.0.1 address: '" + e.getMessage() + "'", e);
+		}
 	}
 }
