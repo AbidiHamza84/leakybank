@@ -3,7 +3,6 @@ package fr.ing.secu.leakybank.pages.login;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -26,11 +25,13 @@ import fr.ing.secu.leakybank.pages.BaseController;
 @RequestMapping("/login")
 public class LoginController extends BaseController {
 
-	@Autowired
-	private UserSession userSession;
+	private final UserSession userSession;
+	private final UsersDAO loginDao;
 
-	@Autowired
-	private UsersDAO loginDao;
+	public LoginController(UserSession userSession, UsersDAO loginDao) {
+		this.userSession = userSession;
+		this.loginDao = loginDao;
+	}
 
 	@RequestMapping(method = RequestMethod.GET)
 	public String showLogin(@ModelAttribute("loginForm") LoginForm loginForm) {
@@ -38,7 +39,7 @@ public class LoginController extends BaseController {
 	}
 
 	@RequestMapping(method = RequestMethod.POST)
-	public String submitLogin(@ModelAttribute("loginForm") @Valid LoginForm loginForm, BindingResult result, HttpSession session) {
+	public String submitLogin(@Valid @ModelAttribute("loginForm") LoginForm loginForm, BindingResult result, HttpSession session) {
 
 		// Return to login page for validation errors
 		if (result.hasErrors()) {

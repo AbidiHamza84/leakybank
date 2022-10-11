@@ -8,7 +8,6 @@ import java.util.List;
 
 import javax.validation.Valid;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
@@ -36,15 +35,18 @@ import fr.ing.secu.leakybank.pages.admin.sql.SQLConsoleForm;
 public class AdminController extends BaseController {
 	
 	
-	@Autowired
-	private UsersDAO usersDao;
+	private final UsersDAO usersDao;
 	
-	@Autowired
-	private JdbcTemplate jdbcTemplate;
+	private final JdbcTemplate jdbcTemplate;
 	
-	@Autowired
-	private UserSession userSession;
-	
+	private final UserSession userSession;
+
+	public AdminController(UsersDAO usersDao, JdbcTemplate jdbcTemplate, UserSession userSession) {
+		this.usersDao = usersDao;
+		this.jdbcTemplate = jdbcTemplate;
+		this.userSession = userSession;
+	}
+
 	/**
 	 * Main admin page
 	 */
@@ -88,8 +90,8 @@ public class AdminController extends BaseController {
 		SQLConsoleForm queryResult = jdbcTemplate.execute(sqlForm.getSqlQuery(), (PreparedStatement ps) -> {
 
 			SQLConsoleForm data = new SQLConsoleForm();
-			data.setColumnNames(new ArrayList<String>());
-			data.setResultSet(new ArrayList<List<String>>());
+			data.setColumnNames(new ArrayList<>());
+			data.setResultSet(new ArrayList<>());
 			ps.execute();
 			ResultSet rs = ps.getResultSet();
 

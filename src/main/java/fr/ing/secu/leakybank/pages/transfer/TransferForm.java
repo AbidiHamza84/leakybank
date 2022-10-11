@@ -1,13 +1,13 @@
 package fr.ing.secu.leakybank.pages.transfer;
 
-import java.math.BigDecimal;
 
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotEmpty;
+import java.math.BigDecimal;
 
 public class TransferForm {
 
-	@NotNull(message = "Amount is required.")
+	@NotEmpty(message = "Amount is required.")
 	private BigDecimal amount;
 
 	@Min(value=1, message = "Please select a debited account.")

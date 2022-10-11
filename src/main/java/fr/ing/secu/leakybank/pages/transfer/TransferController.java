@@ -2,9 +2,6 @@ package fr.ing.secu.leakybank.pages.transfer;
 
 import java.math.BigDecimal;
 
-import javax.validation.Valid;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -17,18 +14,21 @@ import fr.ing.secu.leakybank.dao.AccountsDAO;
 import fr.ing.secu.leakybank.dao.TransactionsDAO;
 import fr.ing.secu.leakybank.pages.BaseController;
 
+import javax.validation.Valid;
+
 @Controller
 @RequestMapping("/transfers")
 public class TransferController extends BaseController {
 
-	@Autowired
-	private UserSession userSession;
+	private final UserSession userSession;
+	private final AccountsDAO accountsDOA;
+	private final TransactionsDAO transactionDAO;
 
-	@Autowired
-	private AccountsDAO accountsDOA;
-	
-	@Autowired
-	private TransactionsDAO transactionDAO;
+	public TransferController(UserSession userSession, AccountsDAO accountsDOA, TransactionsDAO transactionDAO) {
+		this.userSession = userSession;
+		this.accountsDOA = accountsDOA;
+		this.transactionDAO = transactionDAO;
+	}
 
 	/**
 	 * Display the money transfer page
@@ -39,7 +39,7 @@ public class TransferController extends BaseController {
 		fillModel(model);
 
 		return "transfers";
-	};
+	}
 
 	/**
 	 * Process a money transfer request
@@ -70,12 +70,11 @@ public class TransferController extends BaseController {
 		}
 
 
-	};
+	}
 
 	/**
 	 * Fill fields
-	 * 
-	 * @param model
+	 *
 	 */
 	private void fillModel(ModelMap model) {
 		// Add debit / credit accounts
