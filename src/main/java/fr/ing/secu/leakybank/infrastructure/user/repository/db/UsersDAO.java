@@ -3,8 +3,9 @@ package fr.ing.secu.leakybank.infrastructure.user.repository.db;
 import java.util.List;
 import java.util.Optional;
 
-import fr.ing.secu.leakybank.application.pages.login.UserDTO;
+
 import fr.ing.secu.leakybank.domain.user.Customer;
+import fr.ing.secu.leakybank.infrastructure.user.entity.CustomerEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -18,7 +19,7 @@ public class UsersDAO {
 	private JdbcTemplate jdbcTemplate;
 	
 	/** Maps USERS table result set to User beans*/
-	private final RowMapper<UserDTO> userRowMapper = (rs, rowNum) -> new UserDTO(rs.getString("LOGIN"), rs.getString("FIRST_NAME"), rs.getString("LAST_NAME"), rs.getBoolean("IS_ADMIN"));
+	private final RowMapper<CustomerEntity> userRowMapper = (rs, rowNum) -> new CustomerEntity(rs.getString("LOGIN"), rs.getString("FIRST_NAME"), rs.getString("LAST_NAME"), rs.getBoolean("IS_ADMIN"));
 
 	/**
 	 * Login a user
@@ -26,7 +27,7 @@ public class UsersDAO {
 	 * @return Details on the user if login credentials are valid, else return null
 	 *         an exception
 	 */
-	public Optional<UserDTO> login(String login, String password) {
+	public Optional<CustomerEntity> login(String login, String password) {
 		try {
 			return jdbcTemplate.query(
                     "select LOGIN, FIRST_NAME, LAST_NAME, IS_ADMIN from users where login = ? and password = ?"
@@ -40,13 +41,13 @@ public class UsersDAO {
 	}
 	
 	/** Return the list of non-admin users */
-	public List<UserDTO> findUsers() {
+	public List<CustomerEntity> findUsers() {
 		return jdbcTemplate.query(
 				"select LOGIN, FIRST_NAME, LAST_NAME, IS_ADMIN from users where IS_ADMIN = ?"
 				, preparedStatement -> preparedStatement.setBoolean(1, false), userRowMapper);
 	}
 
-	public Optional<UserDTO> findUser(String username) {
+	public Optional<CustomerEntity> findUser(String username) {
 		return jdbcTemplate.query(
 				"select LOGIN, FIRST_NAME, LAST_NAME, IS_ADMIN from users where LOGIN = ?"
 				, preparedStatement -> {
