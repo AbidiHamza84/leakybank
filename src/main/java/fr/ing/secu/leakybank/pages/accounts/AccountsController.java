@@ -57,12 +57,19 @@ public class AccountsController extends BaseController {
 
 	@RequestMapping(value = "/{accountNumber}", method = RequestMethod.GET)
 	public ModelAndView accountDetail(@PathVariable int accountNumber) {
-			
-		return accountsDao.findInternalAccountByAccountNumber(accountNumber).map(account -> 
-			new ModelAndView("accountDetail")
-				.addObject("account", account)
-				.addObject("user", userSession.getUser())
-				.addObject("transactions", transactionsDao.findTransactionsByAccountNumber(accountNumber))
+		if(userSession.getUser().isAdmin()) {
+			return accountsDao.findInternalAccountByAccountNumberAndUser(accountNumber).map(account ->
+					new ModelAndView("accountDetail")
+							.addObject("account", account)
+							.addObject("user", userSession.getUser())
+							.addObject("transactions", transactionsDao.findTransactionsByAccountNumber(accountNumber))
+			).orElse(new ModelAndView("redirect:/accounts"));
+		} else {
+			return accountsDao.findInternalAccountByAccountNumberAndUser(accountNumber, userSession.getUser().getLogin()).map(account ->
+					new ModelAndView("accountDetail")
+							.addObject("account", account)
+							.addObject("user", userSession.getUser())
+							.addObject("transactions", transactionsDao.findTransactionsByAccountNumber(accountNumber))
 			).orElse(new ModelAndView("redirect:/accounts"));
 		
 	}

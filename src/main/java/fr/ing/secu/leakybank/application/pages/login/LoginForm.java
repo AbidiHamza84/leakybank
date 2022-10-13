@@ -1,13 +1,14 @@
 package fr.ing.secu.leakybank.application.pages.login;
 
-import org.hibernate.validator.constraints.NotEmpty;
+
+import javax.validation.constraints.NotBlank;
 
 public class LoginForm {
 	
-	@NotEmpty(message="Login is required.")
+	@NotBlank(message="Login is required.")
 	private String login;
 	
-	@NotEmpty(message="Password is required.")
+	@NotBlank(message="Password is required.")
 	private String password;
 	
 	/**

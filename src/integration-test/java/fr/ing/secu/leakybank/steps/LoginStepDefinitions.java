@@ -4,12 +4,11 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 
-import org.springframework.boot.context.embedded.LocalServerPort;
-
 import io.cucumber.java8.En;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import org.springframework.boot.test.web.server.LocalServerPort;
 
 
 public class LoginStepDefinitions implements En {

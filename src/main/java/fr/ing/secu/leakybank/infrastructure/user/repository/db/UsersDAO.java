@@ -27,7 +27,12 @@ public class UsersDAO {
 	 */
 	public Optional<UserDTO> login(String login, String password) {
 		try {
-			return Optional.of(jdbcTemplate.queryForObject("select LOGIN, FIRST_NAME, LAST_NAME, IS_ADMIN from users where login='" + login + "' and password='" + password + "'", userRowMapper));
+			return jdbcTemplate.query(
+                    "select LOGIN, FIRST_NAME, LAST_NAME, IS_ADMIN from users where login = ? and password = ?"
+                    , preparedStatement -> {
+						preparedStatement.setString(1, login);
+						preparedStatement.setString(2, password);
+					}, userRowMapper).stream().findFirst();
 		} catch (EmptyResultDataAccessException ex) {
 			return Optional.empty();
 		}
@@ -35,10 +40,25 @@ public class UsersDAO {
 	
 	/** Return the list of non-admin users */
 	public List<UserDTO> findUsers() {
-		return jdbcTemplate.query("select LOGIN, FIRST_NAME, LAST_NAME, IS_ADMIN from users where IS_ADMIN = false", userRowMapper);
+		return jdbcTemplate.query(
+				"select LOGIN, FIRST_NAME, LAST_NAME, IS_ADMIN from users where IS_ADMIN = ?"
+				, preparedStatement -> {
+					preparedStatement.setBoolean(1, false);
+				}, userRowMapper);
+	}
+
+	public Optional<User> findUser(String username) {
+		return jdbcTemplate.query(
+				"select LOGIN, FIRST_NAME, LAST_NAME, IS_ADMIN from users where LOGIN = ?"
+				, preparedStatement -> {
+					preparedStatement.setString(1, username);
+				}, userRowMapper).stream().findFirst();
 	}
 	
 	public void deleteUser(String login) {
-		jdbcTemplate.update("delete from USERS where login='" + login + "'");
+		jdbcTemplate.update("delete from USERS where login = ?"
+				, preparedStatement -> {
+					preparedStatement.setString(1, login);
+				});
 	}
 }

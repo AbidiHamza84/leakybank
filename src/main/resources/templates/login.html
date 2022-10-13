@@ -8,7 +8,7 @@
 				<img src="img/logo.svg" height="200px"/>
 				Welcome to <b>Leaky Bank</b>
 			</h1>
-			<div th:replace="fragments/nav :: topMessage(${message})"></div>
+			<div th:replace="fragments/nav :: topMessage(${message == null ? null : message.replaceAll('[^a-zA-Z0-9 .()_-]','')})"></div>
 
 			<form action="#" th:action="@{/login}" th:object="${loginForm}"
 				method="post" style="margin-top: 50px;">
@@ -26,12 +26,12 @@
 					</div>
 
 					<!-- Login -->
-					<label for="login">Login <small>required</small></label> <input
+					<label th:required="required" for="login">Login</label> <input
 						type="text" th:field="*{login}" />
 					<div th:errors="*{login}" class="fieldErrorMessage"></div>
 
 					<!-- Password -->
-					<label for="password">Password <small>required</small></label> <input
+					<label th:required="required" for="password">Password</label> <input
 						type="password" th:field="*{password}" />
 					<div th:errors="*{password}" class="fieldErrorMessage"></div>
 
