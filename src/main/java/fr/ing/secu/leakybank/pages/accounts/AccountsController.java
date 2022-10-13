@@ -48,7 +48,7 @@ public class AccountsController extends BaseController {
 		mView.addObject("internalAccounts", accounts);
 
 		// Compute total available balance
-		BigDecimal totalAvailableBalance = accounts.stream().map(InternalAccount::getAvailableBalance).reduce((acc, value) -> acc.add(value))
+		BigDecimal totalAvailableBalance = accounts.stream().map(InternalAccount::getAvailableBalance).reduce(BigDecimal::add)
 				.orElse(BigDecimal.ZERO);
 		mView.addObject("totalAvailableBalance", totalAvailableBalance);
 
@@ -57,7 +57,7 @@ public class AccountsController extends BaseController {
 
 	@RequestMapping(value = "/{accountNumber}", method = RequestMethod.GET)
 	public ModelAndView accountDetail(@PathVariable int accountNumber) {
-		if(userSession.getUser().isAdmin()) {
+		if (userSession.getUser().isAdmin()) {
 			return accountsDao.findInternalAccountByAccountNumberAndUser(accountNumber).map(account ->
 					new ModelAndView("accountDetail")
 							.addObject("account", account)
@@ -71,7 +71,7 @@ public class AccountsController extends BaseController {
 							.addObject("user", userSession.getUser())
 							.addObject("transactions", transactionsDao.findTransactionsByAccountNumber(accountNumber))
 			).orElse(new ModelAndView("redirect:/accounts"));
-		
-	}
 
+		}
+	}
 }

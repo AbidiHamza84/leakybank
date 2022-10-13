@@ -17,7 +17,7 @@ public class UsersDAO {
 	private JdbcTemplate jdbcTemplate;
 	
 	/** Maps USERS table result set to User beans*/
-	private RowMapper<UserDTO> userRowMapper = (rs, rowNum) -> new UserDTO(rs.getString("LOGIN"), rs.getString("FIRST_NAME"), rs.getString("LAST_NAME"), rs.getBoolean("IS_ADMIN"));
+	private final RowMapper<UserDTO> userRowMapper = (rs, rowNum) -> new UserDTO(rs.getString("LOGIN"), rs.getString("FIRST_NAME"), rs.getString("LAST_NAME"), rs.getBoolean("IS_ADMIN"));
 
 	/**
 	 * Login a user
@@ -42,12 +42,10 @@ public class UsersDAO {
 	public List<UserDTO> findUsers() {
 		return jdbcTemplate.query(
 				"select LOGIN, FIRST_NAME, LAST_NAME, IS_ADMIN from users where IS_ADMIN = ?"
-				, preparedStatement -> {
-					preparedStatement.setBoolean(1, false);
-				}, userRowMapper);
+				, preparedStatement -> preparedStatement.setBoolean(1, false), userRowMapper);
 	}
 
-	public Optional<User> findUser(String username) {
+	public Optional<UserDTO> findUser(String username) {
 		return jdbcTemplate.query(
 				"select LOGIN, FIRST_NAME, LAST_NAME, IS_ADMIN from users where LOGIN = ?"
 				, preparedStatement -> {
@@ -57,8 +55,6 @@ public class UsersDAO {
 	
 	public void deleteUser(String login) {
 		jdbcTemplate.update("delete from USERS where login = ?"
-				, preparedStatement -> {
-					preparedStatement.setString(1, login);
-				});
+				, preparedStatement -> preparedStatement.setString(1, login));
 	}
 }

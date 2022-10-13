@@ -1,6 +1,6 @@
 package fr.ing.secu.leakybank.steps;
 
-import fr.ing.secu.leakybank.dao.UsersDAO;
+import fr.ing.secu.leakybank.infrastructure.user.repository.db.UsersDAO;
 import io.cucumber.java8.En;
 import io.restassured.RestAssured;
 import io.restassured.authentication.FormAuthConfig;
@@ -30,9 +30,7 @@ public class UserManagementStepDefinitions implements En {
         RestAssured.port = 8080;
         RestAssured.basePath = "/";
 
-        Before(() -> {
-            response = null;
-        });
+        Before(() -> response = null);
 
         Given("{word} is connected", (String profile) -> {
             //System.out.println("Given ok");
@@ -50,9 +48,7 @@ public class UserManagementStepDefinitions implements En {
             System.out.println();
         });
 
-        When("the {word} try to delete a user account", (String profile) -> {
-            response = request.when().delete("admin/users/bob/delete");
-        });
+        When("the {word} try to delete a user account", (String profile) -> response = request.when().delete("admin/users/bob/delete"));
 
         Then("the {word} {word} to delete the user account", (String profile, String status) -> {
             if ("succeed".equals(status)) {
@@ -62,13 +58,9 @@ public class UserManagementStepDefinitions implements En {
             }
         });
 
-        Then("the user account still present in database", () -> {
-            Assert.assertTrue(usersDAO.findUser("bob").isPresent());
-        });
+        Then("the user account still present in database", () -> Assert.assertTrue(usersDAO.findUser("bob").isPresent()));
 
-        Then("the user account is successfully deleted from database", () -> {
-            Assert.assertFalse(usersDAO.findUser("bob").isPresent());
-        });
+        Then("the user account is successfully deleted from database", () -> Assert.assertFalse(usersDAO.findUser("bob").isPresent()));
     }
 
 }
