@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import fr.ing.secu.leakybank.application.pages.login.UserDTO;
+import fr.ing.secu.leakybank.domain.user.Customer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -53,8 +54,8 @@ public class UsersDAO {
 				}, userRowMapper).stream().findFirst();
 	}
 	
-	public void deleteUser(String login) {
+	public void deleteCustomer(Customer customer) {
 		jdbcTemplate.update("delete from USERS where login = ?"
-				, preparedStatement -> preparedStatement.setString(1, login));
+				, preparedStatement -> preparedStatement.setString(1, customer.getLogin()));
 	}
 }

@@ -1,4 +1,4 @@
-package fr.ing.secu.leakybank.pages.admin.sql;
+package fr.ing.secu.leakybank.application.pages.admin;
 
 import java.util.List;
 
@@ -15,10 +15,6 @@ public class SQLConsoleForm {
 
 	public String getSqlQuery() {
 		return sqlQuery;
-	}
-
-	public void setSqlQuery(String sqlQuery) {
-		this.sqlQuery = sqlQuery;
 	}
 
 	public List<String> getColumnNames() {

@@ -6,6 +6,7 @@ import java.util.function.Supplier;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
+import fr.ing.secu.leakybank.domain.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -17,7 +18,6 @@ import com.google.common.base.Strings;
 
 import fr.ing.secu.leakybank.UserSession;
 import fr.ing.secu.leakybank.application.pages.login.mapper.UserMapper;
-import fr.ing.secu.leakybank.domain.UserService;
 import fr.ing.secu.leakybank.domain.user.Customer;
 import fr.ing.secu.leakybank.pages.BaseController;
 
