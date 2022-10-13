@@ -17,6 +17,10 @@ public class SQLConsoleForm {
 		return sqlQuery;
 	}
 
+	public void setSqlQuery(String sqlQuery) {
+		this.sqlQuery = sqlQuery;
+	}
+
 	public List<String> getColumnNames() {
 		return columnNames;
 	}
